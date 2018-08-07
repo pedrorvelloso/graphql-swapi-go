@@ -34,14 +34,6 @@ var CharacterType = graphql.NewObject(
 			"gender": &graphql.Field{
 				Type: graphql.String,
 			},
-			"homeworld": &graphql.Field{
-				Type: PlanetType,
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					source := p.Source.(map[string]interface{})
-					result := request.DoGetFullLink(source["homeworld"].(string))
-					return result, nil
-				},
-			},
 		},
 	},
 )
@@ -53,6 +45,28 @@ func init() {
 			filmsLink := p.Source.(map[string]interface{})["films"].([]interface{})
 			var results []interface{}
 			for _, v := range filmsLink {
+				result := request.DoGetFullLink(v.(string))
+				results = append(results, result)
+			}
+			return results, nil
+		},
+	})
+
+	CharacterType.AddFieldConfig("homeworld", &graphql.Field{
+		Type: PlanetType,
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			source := p.Source.(map[string]interface{})
+			result := request.DoGetFullLink(source["homeworld"].(string))
+			return result, nil
+		},
+	})
+
+	CharacterType.AddFieldConfig("species", &graphql.Field{
+		Type: graphql.NewList(SpecieType),
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			speciesLink := p.Source.(map[string]interface{})["species"].([]interface{})
+			var results []interface{}
+			for _, v := range speciesLink {
 				result := request.DoGetFullLink(v.(string))
 				results = append(results, result)
 			}
