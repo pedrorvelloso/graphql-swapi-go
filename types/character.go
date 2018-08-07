@@ -45,3 +45,18 @@ var CharacterType = graphql.NewObject(
 		},
 	},
 )
+
+func init() {
+	CharacterType.AddFieldConfig("films", &graphql.Field{
+		Type: graphql.NewList(FilmType),
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			filmsLink := p.Source.(map[string]interface{})["films"].([]interface{})
+			var results []interface{}
+			for _, v := range filmsLink {
+				result := request.DoGetFullLink(v.(string))
+				results = append(results, result)
+			}
+			return results, nil
+		},
+	})
+}

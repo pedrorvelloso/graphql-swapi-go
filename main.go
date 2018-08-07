@@ -31,6 +31,19 @@ func main() {
 						return r, nil
 					},
 				},
+				"character": &graphql.Field{
+					Type: types.CharacterType,
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+					},
+					Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+						result := request.DoGet("people/" + strconv.Itoa(p.Args["id"].(int)))
+						r := result
+						return r, nil
+					},
+				},
 				"planet": &graphql.Field{
 					Type: types.PlanetType,
 					Args: graphql.FieldConfigArgument{
